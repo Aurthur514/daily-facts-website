@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generative AI Search</title>
+    <title>Advanced AI Search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -87,7 +87,7 @@
             text-align: left;
         }
         
-        .ai-answer-card {
+        .result-card {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
             padding: 2rem;
@@ -97,30 +97,59 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
             animation: fadeIn 0.5s forwards;
             opacity: 0;
+            margin-bottom: 2rem;
         }
         
+        .web-result-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s forwards;
+            opacity: 0;
+        }
+
         @keyframes fadeIn {
             to { opacity: 1; }
         }
 
-        .ai-answer-card h2 {
+        .result-card h2 {
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1rem;
         }
+        
+        .result-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
 
-        .ai-answer-card p {
+        .result-card p, .web-result-card p {
             line-height: 1.6;
             margin-bottom: 1rem;
         }
         
-        .ai-answer-card .sources {
+        .web-result-card .url {
+            font-size: 0.9rem;
+            color: #a0aec0; /* A soft grey color */
+            font-weight: 400;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-card .sources {
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.7);
             margin-top: 1.5rem;
         }
 
-        .ai-answer-card .sources a {
+        .result-card .sources a {
             text-decoration: underline;
             color: #fff;
         }
@@ -171,124 +200,154 @@
             const searchInput = document.getElementById('search-input');
             const resultsContainer = document.getElementById('results-container');
 
-            // --- A more comprehensive simulated ML Model Responses ---
-            // This object now includes more topics to answer a wider range of questions.
-            const mlResponses = {
+            // --- Advanced Simulated Database ---
+            const simulatedDatabase = {
                 "pyramids": {
-                    answer: "The Great Pyramids of Giza were constructed over a period of many decades, primarily during the Fourth Dynasty of ancient Egypt. They were built as tombs for pharaohs and their consorts, intended to protect their remains and belongings for eternity. The precise methods of construction are still a subject of scholarly debate, though it is widely believed that large workforces used ramps and levers to move and place the massive stone blocks.",
+                    answer: "The Great Pyramids of Giza were built as tombs for pharaohs and their consorts. Constructed primarily during the Fourth Dynasty of ancient Egypt, their precise construction methods are still debated, though it is believed that a large workforce used ramps and levers to move the massive stone blocks.",
                     sources: [
                         { text: "History of Ancient Egypt", url: "https://www.nationalgeographic.org/encyclopedia/ancient-egypt/" },
-                        { text: "The Pyramids of Giza", url: "https://www.britannica.com/topic/Pyramids-of-Giza" }
-                    ]
-                },
-                "algorithm": {
-                    answer: "An algorithm is a set of well-defined, step-by-step instructions for performing a task or solving a problem. In computing, algorithms are the foundation of all software, from simple calculators to complex artificial intelligence systems. They take an input, process it according to the defined steps, and produce an output. Famous examples include sorting algorithms like Quicksort and search algorithms like Dijkstra's algorithm for finding the shortest path.",
-                    sources: [
-                        { text: "Introduction to Algorithms", url: "https://mitpress.mit.edu/books/introduction-algorithms" },
-                        { text: "What is an Algorithm?", url: "https://www.geeksforgeeks.org/introduction-to-algorithms/" }
-                    ]
-                },
-                "venus": {
-                    answer: "A day on Venus is indeed longer than its year. Venus rotates on its axis very slowly—taking about 243 Earth days to complete one rotation (a Venusian 'day'). However, it orbits the Sun in just about 225 Earth days (a Venusian 'year'). This bizarre phenomenon is due to its slow, retrograde rotation, meaning it spins backward compared to most other planets in our solar system.",
-                    sources: [
-                        { text: "Planetary Facts - Venus", url: "https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html" },
-                        { text: "Retrograde Rotation of Venus", url: "https://www.nasa.gov/feature/goddard/2016/venus-spin" }
+                    ],
+                    webResults: [
+                        { title: "Pyramids of Giza - Britannica", url: "https://www.britannica.com/topic/Pyramids-of-Giza", snippet: "The Pyramids of Giza are among the most famous and well-preserved examples of ancient Egyptian engineering and funerary architecture." },
+                        { title: "Ancient Egypt: Pyramids and the Afterlife", url: "https://www.history.com/topics/ancient-history/ancient-egyptian-pyramids", snippet: "Explore the fascinating history behind the pyramids and their role in the ancient Egyptian belief system regarding the afterlife and pharaohs." }
                     ]
                 },
                 "speed of light": {
-                    answer: "The speed of light in a vacuum is a fundamental physical constant, denoted by the letter $c$. Its exact value is $299,792,458$ meters per second (approximately 186,282 miles per second). This speed is the maximum speed at which all energy, matter, and information can travel in the universe. It is a cornerstone of Albert Einstein's theory of relativity, where it is used to relate mass and energy in the famous equation $E=mc^2$.",
+                    answer: "The speed of light in a vacuum is a fundamental physical constant, approximately 299,792,458 meters per second. This speed is the maximum at which all energy and information can travel, forming a cornerstone of Albert Einstein's theory of relativity ($E=mc^2$).",
                     sources: [
                         { text: "CODATA Recommended Values", url: "https://physics.nist.gov/cgi-bin/cuu/Value?c" },
-                        { text: "Einstein's Theory of Relativity", url: "https://www.space.com/17661-theory-of-relativity.html" }
+                    ],
+                    webResults: [
+                        { title: "The Speed of Light - NASA", url: "https://science.nasa.gov/science-news/science-at-nasa/2002/06may_speedoflight", snippet: "Learn about the significance of the speed of light, how it was measured, and its impact on modern physics and space exploration." },
+                        { title: "What is the Speed of Light?", url: "https://www.livescience.com/37022-speed-of-light.html", snippet: "A detailed article explaining the constant nature of light's speed, its history of measurement, and why nothing can exceed it." }
                     ]
                 },
                 "machine learning": {
-                    answer: "Machine learning is a subfield of artificial intelligence that focuses on the development of algorithms that can learn from and make predictions on data. Instead of being explicitly programmed with rules, these algorithms are trained on large datasets to recognize patterns and make informed decisions. Key areas of machine learning include supervised learning, unsupervised learning, and reinforcement learning, with applications ranging from image recognition to natural language processing.",
+                    answer: "Machine learning is a subfield of artificial intelligence where algorithms learn from data to make predictions or decisions, without being explicitly programmed. It is the foundation for technologies like image recognition, natural language processing, and recommendation systems.",
                     sources: [
                         { text: "What is Machine Learning?", url: "https://www.ibm.com/cloud/learn/machine-learning" },
-                        { text: "Machine Learning: A Probabilistic Perspective", url: "https://www.cs.ubc.ca/~murphyk/MLbook/" }
+                    ],
+                    webResults: [
+                        { title: "Machine Learning Demystified - Google AI", url: "https://ai.googleblog.com/2016/11/what-is-machine-learning.html", snippet: "An accessible introduction to the core concepts of machine learning, explained by researchers at Google AI." },
+                        { title: "How Does Machine Learning Work?", url: "https://towardsdatascience.com/how-does-machine-learning-work-b1968846175f", snippet: "A high-level overview of the process, from data collection and model training to evaluation and deployment." }
                     ]
                 },
                 "black holes": {
-                    answer: "A black hole is a region of spacetime where gravity is so strong that nothing—no particles or even electromagnetic radiation such as light—can escape. The theory of general relativity predicts that a sufficiently compact mass can deform spacetime to form a black hole. The boundary of the region from which no escape is possible is called the event horizon. While we cannot see black holes directly, their presence is inferred through their effects on surrounding matter and light.",
+                    answer: "A black hole is a region in space where the gravitational pull is so strong that nothing, not even light, can escape. They are formed from the remnants of massive stars that have collapsed under their own gravity. Their presence is detected by observing their effects on surrounding stars and gas.",
                     sources: [
                         { text: "Black Holes Explained", url: "https://science.nasa.gov/astrophysics/focus-areas/black-holes/" },
-                        { text: "General Relativity", url: "https://einstein.stanford.edu/content/relativity-and-black-holes-2/" }
+                    ],
+                    webResults: [
+                        { title: "What is a Black Hole?", url: "https://www.space.com/15207-black-holes-explained.html", snippet: "A comprehensive guide to black holes, including their formation, types, and the physics behind them." },
+                        { title: "Event Horizon Telescope", url: "https://eventhorizontelescope.org/", snippet: "The official site of the project that captured the first-ever image of a black hole's shadow." }
                     ]
-                }
+                },
             };
 
             // --- Function to simulate the typing of a response ---
-            function typeAnswer(element, text, sources) {
+            function typeAnswer(element, text) {
                 let i = 0;
                 element.innerHTML = '';
-                const interval = setInterval(() => {
-                    if (i < text.length) {
-                        element.innerHTML += text.charAt(i);
-                        i++;
-                    } else {
-                        clearInterval(interval);
-                        element.innerHTML += `<span class="blinking-cursor">|</span>`; 
-                        
-                        setTimeout(() => {
-                            const cursor = element.querySelector('.blinking-cursor');
-                            if (cursor) cursor.remove();
-                            if (sources && sources.length > 0) {
-                                let sourcesHtml = `<p class="sources"><strong>Sources:</strong> `;
-                                sources.forEach((source, index) => {
-                                    sourcesHtml += `<a href="${source.url}" target="_blank">${source.text}</a>${index < sources.length - 1 ? ', ' : ''}`;
-                                });
-                                sourcesHtml += `</p>`;
-                                element.innerHTML += sourcesHtml;
-                            }
-                        }, 500);
+                return new Promise(resolve => {
+                    const interval = setInterval(() => {
+                        if (i < text.length) {
+                            element.innerHTML += text.charAt(i);
+                            i++;
+                        } else {
+                            clearInterval(interval);
+                            element.innerHTML += `<span class="blinking-cursor">|</span>`;
+                            setTimeout(() => {
+                                const cursor = element.querySelector('.blinking-cursor');
+                                if (cursor) cursor.remove();
+                                resolve();
+                            }, 500);
+                        }
+                    }, 20);
+                });
+            }
+
+            // --- Function to create a web result card ---
+            function createWebResultCard(result, delay) {
+                const card = document.createElement('div');
+                card.className = 'web-result-card';
+                card.style.animationDelay = `${delay}s`;
+                card.innerHTML = `
+                    <h3 class="font-bold text-white"><a href="${result.url}" target="_blank">${result.title}</a></h3>
+                    <a href="${result.url}" class="url" target="_blank">${result.url}</a>
+                    <p class="text-white/80">${result.snippet}</p>
+                `;
+                return card;
+            }
+
+            // --- Function to find the best match based on keywords ---
+            function findBestMatch(query) {
+                const normalizedQuery = query.toLowerCase();
+                for (const key in simulatedDatabase) {
+                    if (normalizedQuery.includes(key) || key.includes(normalizedQuery)) {
+                        return simulatedDatabase[key];
                     }
-                }, 20);
+                }
+                return null;
             }
 
             // --- Main function to handle the search logic ---
-            function performAISearch(query) {
+            async function performAISearch(query) {
                 resultsContainer.innerHTML = `<div class="loader"></div>`;
                 
-                setTimeout(() => {
-                    resultsContainer.innerHTML = '';
-                    const normalizedQuery = query.toLowerCase();
-                    let response = null;
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                resultsContainer.innerHTML = '';
+                const match = findBestMatch(query);
 
-                    for (const key in mlResponses) {
-                        if (normalizedQuery.includes(key)) {
-                            response = mlResponses[key];
-                            break;
-                        }
-                    }
+                if (match) {
+                    // Create AI Answer Card
+                    const aiAnswerCard = document.createElement('div');
+                    aiAnswerCard.className = 'result-card';
+                    aiAnswerCard.innerHTML = `<h2>AI-Generated Answer</h2><p id="typed-answer"></p>`;
+                    resultsContainer.appendChild(aiAnswerCard);
+                    
+                    const typedAnswerElement = document.getElementById('typed-answer');
+                    await typeAnswer(typedAnswerElement, match.answer);
 
-                    if (response) {
-                        const answerCard = document.createElement('div');
-                        answerCard.className = 'ai-answer-card';
-                        answerCard.innerHTML = `<h2>AI-Generated Answer</h2><p id="typed-answer"></p>`;
-                        resultsContainer.appendChild(answerCard);
-                        
-                        const typedAnswerElement = document.getElementById('typed-answer');
-                        typeAnswer(typedAnswerElement, response.answer, response.sources);
+                    let sourcesHtml = `<p class="sources"><strong>Sources:</strong> `;
+                    match.sources.forEach((source, index) => {
+                        sourcesHtml += `<a href="${source.url}" target="_blank">${source.text}</a>${index < match.sources.length - 1 ? ', ' : ''}`;
+                    });
+                    sourcesHtml += `</p>`;
+                    typedAnswerElement.parentNode.innerHTML += sourcesHtml;
+                    
+                    // Add a delay before showing web results
+                    await new Promise(resolve => setTimeout(resolve, 500));
 
-                    } else {
-                        // Improved "no match" response
-                        resultsContainer.innerHTML = `
-                            <div class="ai-answer-card">
-                                <h2>AI-Generated Answer</h2>
-                                <p>I'm sorry, I couldn't find a direct answer to that specific query.</p>
-                                <p>Please try one of the following sample questions:</p>
-                                <ul class="list-disc list-inside mt-4">
-                                    <li>What are the pyramids?</li>
-                                    <li>Tell me about the speed of light.</li>
-                                    <li>What is machine learning?</li>
-                                    <li>Explain algorithms.</li>
-                                    <li>What are black holes?</li>
-                                </ul>
-                            </div>
-                        `;
-                    }
-                }, 1500);
+                    // Create Web Results Section
+                    const webResultsTitle = document.createElement('h3');
+                    webResultsTitle.className = 'text-2xl font-bold mt-8 mb-4';
+                    webResultsTitle.textContent = "Web Results";
+                    resultsContainer.appendChild(webResultsTitle);
+
+                    const webResultsContainer = document.createElement('div');
+                    resultsContainer.appendChild(webResultsContainer);
+
+                    match.webResults.forEach((result, index) => {
+                        const card = createWebResultCard(result, index * 0.2);
+                        webResultsContainer.appendChild(card);
+                    });
+
+                } else {
+                    resultsContainer.innerHTML = `
+                        <div class="result-card">
+                            <h2>AI-Generated Answer</h2>
+                            <p>I am unable to provide a detailed answer for that topic. Please try one of the following sample queries:</p>
+                            <ul class="list-disc list-inside mt-4">
+                                <li>What are the pyramids?</li>
+                                <li>Tell me about the speed of light.</li>
+                                <li>What is machine learning?</li>
+                                <li>Explain algorithms.</li>
+                                <li>What are black holes?</li>
+                            </ul>
+                        </div>
+                    `;
+                }
             }
 
             // --- Event listener for form submission ---
@@ -299,7 +358,7 @@
                     performAISearch(query);
                 } else {
                     resultsContainer.innerHTML = `
-                        <div class="ai-answer-card">
+                        <div class="result-card">
                             <p>Please enter a search query to get an AI-generated answer.</p>
                         </div>
                     `;
