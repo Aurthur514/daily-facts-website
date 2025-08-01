@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Engine Mock-up</title>
+    <title>Generative AI Search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,9 +14,11 @@
             animation: gradientBG 15s ease infinite;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             color: #fff;
+            padding: 2rem;
+            box-sizing: border-box;
         }
 
         @keyframes gradientBG {
@@ -28,8 +30,8 @@
         .container {
             width: 100%;
             max-width: 800px;
-            padding: 2rem;
             text-align: center;
+            margin-top: 5vh;
         }
 
         .search-box {
@@ -83,55 +85,79 @@
         #results-container {
             margin-top: 3rem;
             text-align: left;
+        }
+        
+        .ai-answer-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
             animation: fadeIn 0.5s forwards;
             opacity: 0;
         }
         
         @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
+            to { opacity: 1; }
         }
 
-        .search-result {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-result .title {
-            font-size: 1.25rem;
+        .ai-answer-card h2 {
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #fff;
-            margin-bottom: 0.25rem;
+            margin-bottom: 1rem;
         }
 
-        .search-result .url {
+        .ai-answer-card p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .ai-answer-card .sources {
             font-size: 0.9rem;
-            color: #a0aec0; /* A soft grey color */
-            font-weight: 400;
-            display: block;
-            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 1.5rem;
         }
 
-        .search-result .snippet {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.5;
+        .ai-answer-card .sources a {
+            text-decoration: underline;
+            color: #fff;
         }
+
+        .blinking-cursor {
+            font-weight: 300;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { color: transparent; }
+            50% { color: white; }
+        }
+
+        .loader {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 3rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1 class="text-6xl font-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">Search</h1>
+        <h1 class="text-6xl font-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">AI Search</h1>
         <form id="search-form" class="search-box">
-            <input type="text" id="search-input" placeholder="Search the web..." autocomplete="off">
+            <input type="text" id="search-input" placeholder="Ask me anything..." autocomplete="off">
             <button type="submit" id="search-button">Search</button>
         </form>
         
@@ -145,91 +171,138 @@
             const searchInput = document.getElementById('search-input');
             const resultsContainer = document.getElementById('results-container');
 
-            // --- A simulated database of search results ---
-            const mockDatabase = [
-                {
-                    title: "About the Pyramids of Giza",
-                    url: "https://example.com/pyramids-giza",
-                    snippet: "The Great Pyramid of Giza is the oldest and largest of the three pyramids in the Giza pyramid complex, bordering what is now El Giza, Egypt."
+            // --- A more comprehensive simulated ML Model Responses ---
+            // This object now includes more topics to answer a wider range of questions.
+            const mlResponses = {
+                "pyramids": {
+                    answer: "The Great Pyramids of Giza were constructed over a period of many decades, primarily during the Fourth Dynasty of ancient Egypt. They were built as tombs for pharaohs and their consorts, intended to protect their remains and belongings for eternity. The precise methods of construction are still a subject of scholarly debate, though it is widely believed that large workforces used ramps and levers to move and place the massive stone blocks.",
+                    sources: [
+                        { text: "History of Ancient Egypt", url: "https://www.nationalgeographic.org/encyclopedia/ancient-egypt/" },
+                        { text: "The Pyramids of Giza", url: "https://www.britannica.com/topic/Pyramids-of-Giza" }
+                    ]
                 },
-                {
-                    title: "The history of ancient Egypt",
-                    url: "https://history.example.net/ancient-egypt",
-                    snippet: "Ancient Egypt was a civilization of ancient Northeastern Africa, concentrated along the lower reaches of the Nile River..."
+                "algorithm": {
+                    answer: "An algorithm is a set of well-defined, step-by-step instructions for performing a task or solving a problem. In computing, algorithms are the foundation of all software, from simple calculators to complex artificial intelligence systems. They take an input, process it according to the defined steps, and produce an output. Famous examples include sorting algorithms like Quicksort and search algorithms like Dijkstra's algorithm for finding the shortest path.",
+                    sources: [
+                        { text: "Introduction to Algorithms", url: "https://mitpress.mit.edu/books/introduction-algorithms" },
+                        { text: "What is an Algorithm?", url: "https://www.geeksforgeeks.org/introduction-to-algorithms/" }
+                    ]
                 },
-                {
-                    title: "How to build a pyramid with modern tools",
-                    url: "https://modernbuild.org/pyramid",
-                    snippet: "Building a pyramid today would be a monumental task, but with modern cranes and logistics, it could be completed much faster than in ancient times."
+                "venus": {
+                    answer: "A day on Venus is indeed longer than its year. Venus rotates on its axis very slowly—taking about 243 Earth days to complete one rotation (a Venusian 'day'). However, it orbits the Sun in just about 225 Earth days (a Venusian 'year'). This bizarre phenomenon is due to its slow, retrograde rotation, meaning it spins backward compared to most other planets in our solar system.",
+                    sources: [
+                        { text: "Planetary Facts - Venus", url: "https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html" },
+                        { text: "Retrograde Rotation of Venus", url: "https://www.nasa.gov/feature/goddard/2016/venus-spin" }
+                    ]
                 },
-                {
-                    title: "What is an algorithm?",
-                    url: "https://techpedia.com/algorithm",
-                    snippet: "In mathematics and computer science, an algorithm is a finite sequence of well-defined, computer-implementable instructions..."
+                "speed of light": {
+                    answer: "The speed of light in a vacuum is a fundamental physical constant, denoted by the letter $c$. Its exact value is $299,792,458$ meters per second (approximately 186,282 miles per second). This speed is the maximum speed at which all energy, matter, and information can travel in the universe. It is a cornerstone of Albert Einstein's theory of relativity, where it is used to relate mass and energy in the famous equation $E=mc^2$.",
+                    sources: [
+                        { text: "CODATA Recommended Values", url: "https://physics.nist.gov/cgi-bin/cuu/Value?c" },
+                        { text: "Einstein's Theory of Relativity", url: "https://www.space.com/17661-theory-of-relativity.html" }
+                    ]
                 },
-                {
-                    title: "Search engine algorithms explained",
-                    url: "https://searchenginebasics.com/algorithms",
-                    snippet: "Search engine algorithms are complex systems used to retrieve data from search engine indexes and instantly deliver the best possible results..."
+                "machine learning": {
+                    answer: "Machine learning is a subfield of artificial intelligence that focuses on the development of algorithms that can learn from and make predictions on data. Instead of being explicitly programmed with rules, these algorithms are trained on large datasets to recognize patterns and make informed decisions. Key areas of machine learning include supervised learning, unsupervised learning, and reinforcement learning, with applications ranging from image recognition to natural language processing.",
+                    sources: [
+                        { text: "What is Machine Learning?", url: "https://www.ibm.com/cloud/learn/machine-learning" },
+                        { text: "Machine Learning: A Probabilistic Perspective", url: "https://www.cs.ubc.ca/~murphyk/MLbook/" }
+                    ]
                 },
-                {
-                    title: "All about the Internet",
-                    url: "https://web.info/internet-basics",
-                    snippet: "The Internet is the global system of interconnected computer networks that uses the Internet protocol suite (TCP/IP) to communicate..."
-                },
-                {
-                    title: "What is a neural network?",
-                    url: "https://ai-wiki.org/neural-networks",
-                    snippet: "A neural network is a series of algorithms that endeavors to recognize underlying relationships in a set of data through a process that mimics the way the human brain operates."
+                "black holes": {
+                    answer: "A black hole is a region of spacetime where gravity is so strong that nothing—no particles or even electromagnetic radiation such as light—can escape. The theory of general relativity predicts that a sufficiently compact mass can deform spacetime to form a black hole. The boundary of the region from which no escape is possible is called the event horizon. While we cannot see black holes directly, their presence is inferred through their effects on surrounding matter and light.",
+                    sources: [
+                        { text: "Black Holes Explained", url: "https://science.nasa.gov/astrophysics/focus-areas/black-holes/" },
+                        { text: "General Relativity", url: "https://einstein.stanford.edu/content/relativity-and-black-holes-2/" }
+                    ]
                 }
-            ];
+            };
 
-            // --- Function to create a search result card ---
-            function createResultCard(result) {
-                const card = document.createElement('div');
-                card.className = 'search-result';
-                card.innerHTML = `
-                    <h3 class="title">${result.title}</h3>
-                    <a href="${result.url}" class="url" target="_blank">${result.url}</a>
-                    <p class="snippet">${result.snippet}</p>
-                `;
-                return card;
+            // --- Function to simulate the typing of a response ---
+            function typeAnswer(element, text, sources) {
+                let i = 0;
+                element.innerHTML = '';
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        element.innerHTML += `<span class="blinking-cursor">|</span>`; 
+                        
+                        setTimeout(() => {
+                            const cursor = element.querySelector('.blinking-cursor');
+                            if (cursor) cursor.remove();
+                            if (sources && sources.length > 0) {
+                                let sourcesHtml = `<p class="sources"><strong>Sources:</strong> `;
+                                sources.forEach((source, index) => {
+                                    sourcesHtml += `<a href="${source.url}" target="_blank">${source.text}</a>${index < sources.length - 1 ? ', ' : ''}`;
+                                });
+                                sourcesHtml += `</p>`;
+                                element.innerHTML += sourcesHtml;
+                            }
+                        }, 500);
+                    }
+                }, 20);
             }
 
             // --- Main function to handle the search logic ---
-            function performSearch(query) {
-                resultsContainer.innerHTML = ''; // Clear previous results
-
-                // Simulate a search delay
-                resultsContainer.innerHTML = `<p class="mt-4">Searching for "${query}"...</p>`;
-
+            function performAISearch(query) {
+                resultsContainer.innerHTML = `<div class="loader"></div>`;
+                
                 setTimeout(() => {
+                    resultsContainer.innerHTML = '';
                     const normalizedQuery = query.toLowerCase();
-                    const filteredResults = mockDatabase.filter(result => 
-                        result.title.toLowerCase().includes(normalizedQuery) || 
-                        result.snippet.toLowerCase().includes(normalizedQuery)
-                    );
+                    let response = null;
 
-                    resultsContainer.innerHTML = ''; // Clear the "Searching..." message
-
-                    if (filteredResults.length > 0) {
-                        filteredResults.forEach(result => {
-                            resultsContainer.appendChild(createResultCard(result));
-                        });
-                    } else {
-                        resultsContainer.innerHTML = `<p class="mt-4 text-center text-white/80">No results found for "${query}".</p>`;
+                    for (const key in mlResponses) {
+                        if (normalizedQuery.includes(key)) {
+                            response = mlResponses[key];
+                            break;
+                        }
                     }
-                }, 1000); // 1-second delay to simulate network latency
+
+                    if (response) {
+                        const answerCard = document.createElement('div');
+                        answerCard.className = 'ai-answer-card';
+                        answerCard.innerHTML = `<h2>AI-Generated Answer</h2><p id="typed-answer"></p>`;
+                        resultsContainer.appendChild(answerCard);
+                        
+                        const typedAnswerElement = document.getElementById('typed-answer');
+                        typeAnswer(typedAnswerElement, response.answer, response.sources);
+
+                    } else {
+                        // Improved "no match" response
+                        resultsContainer.innerHTML = `
+                            <div class="ai-answer-card">
+                                <h2>AI-Generated Answer</h2>
+                                <p>I'm sorry, I couldn't find a direct answer to that specific query.</p>
+                                <p>Please try one of the following sample questions:</p>
+                                <ul class="list-disc list-inside mt-4">
+                                    <li>What are the pyramids?</li>
+                                    <li>Tell me about the speed of light.</li>
+                                    <li>What is machine learning?</li>
+                                    <li>Explain algorithms.</li>
+                                    <li>What are black holes?</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                }, 1500);
             }
 
             // --- Event listener for form submission ---
             searchForm.addEventListener('submit', function(event) {
-                event.preventDefault(); // Prevents the form from submitting in the traditional way
+                event.preventDefault(); 
                 const query = searchInput.value.trim();
                 if (query) {
-                    performSearch(query);
+                    performAISearch(query);
                 } else {
-                    resultsContainer.innerHTML = `<p class="mt-4 text-center text-white/80">Please enter a search query.</p>`;
+                    resultsContainer.innerHTML = `
+                        <div class="ai-answer-card">
+                            <p>Please enter a search query to get an AI-generated answer.</p>
+                        </div>
+                    `;
                 }
             });
         });
